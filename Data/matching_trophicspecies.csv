@@ -1,0 +1,119 @@
+ID,TL,Web2,Group,Group2
+Active SOM,1,Andres2016,SOM,SOM
+Arbuscular mycorrhizal,1,CPER,Fungi,Fungi
+Blood,1,Koltz2018,Blood,Blood
+Detritus,1,CPER,Detritus,Detritus
+Detritus,1,Koltz2018,Detritus,Detritus
+Detritus,1,deRuiter1994,Detritus,Detritus
+Diatoms,1,Koltz2018,Diatoms,Diatoms
+HerbNem,1,deRuiter1994,PhytoNem,PhytoNem
+LabileOM,1,Holtkamp2011,SOM,SOM
+Lichen,1,Koltz2018,Lichen,Lichen
+Moss,1,Koltz2018,Plant,Plant
+Pollen,1,Koltz2018,Plant,Plant
+RecalOM,1,Holtkamp2011,SOM,SOM
+Roots,1,Andres2016,Roots,Roots
+Roots,1,CPER,Roots,Roots
+Roots,1,Koltz2018,Roots,Roots
+Roots,1,Holtkamp2011,Roots,Roots
+Slow SOM,1,Andres2016,SOM,SOM
+VascularPlants.aboveground.tissue,1,Koltz2018,Plant,Plant
+WaterSolubleSugars,1,Holtkamp2011,SOM,SOM
+Bacteria,2,Andres2016,Bacteria,Bacteria
+Bacteria,2,CPER,Bacteria,Bacteria
+Bacteria,2,Koltz2018,Bacteria,Bacteria
+Bacteria,2,deRuiter1994,Bacteria,Bacteria
+Bacteria,2,Holtkamp2011,Bacteria,Bacteria
+BitingFlies,2,Koltz2018,BitingFlies,BitingFlies
+Earthworm,2,deRuiter1994,Earthworm,Earthworm
+Enchytraeids,2,Holtkamp2011,Enchytraeids,Enchytraeids
+Fungi,2,Andres2016,Fungi,Fungi
+Fungi,2,Koltz2018,Fungi,Fungi
+Fungi,2,deRuiter1994,Fungi,Fungi
+Fungi,2,Holtkamp2011,Fungi,Fungi
+HerbivorousTrueBugs,2,Koltz2018,Herbivores,Herbivores
+Lepidoptera,2,Koltz2018,Herbivores,Herbivores
+NonbitingMidges,2,Koltz2018,NonbitingMidges,NonbitingMidges
+PhytoNem,2,Holtkamp2011,PhytoNem,Nematodes
+Phytophagous nematodes,2,Andres2016,PhytoNem,Nematodes
+Phytophagous nematodes,2,CPER,PhytoNem,Nematodes
+PhytophagousNematodes,2,Koltz2018,PhytoNem,Nematodes
+Saprobic fungi,2,CPER,Fungi,Fungi
+SaprophagousDiptera,2.25,Koltz2018,SaprophagousDiptera,SaprophagousDiptera
+HerbivorousFlies,2.4,Koltz2018,Herbivores,Herbivores
+Collembola,2.5,CPER,Collembola,Collembola
+CollembolaSoil,2.5,Koltz2018,Collembola,Collembola
+CraneFlies,2.5,Koltz2018,CraneFlies,CraneFlies
+CryptostigmaticMites,2.5,Koltz2018,Mite,Mite
+Cryptostigmatid mites,2.5,CPER,Mite,Mite
+Ench,2.5,deRuiter1994,Enchytraeids,Enchytraeids
+Fungivorous nematodes,2.5,CPER,FungNem,Nematodes
+FungivorousNematodes,2.5,Koltz2018,FungNem,Nematodes
+NonCryptostigmaticMites,2.5,Koltz2018,Mite,Mite
+Non-cryptostigmatid,2.5,CPER,Mite,Mite
+SurfaceCollembola,2.5,Koltz2018,Collembola,Collembola
+Enchytraeids,2.666666667,Koltz2018,Enchytraeids,Enchytraeids
+Bacteriophagous nematodes,3,Andres2016,BactNem,Nematodes
+Bacteriophagous Nematodes,3,CPER,BactNem,Nematodes
+BacteriophagousNematodes,3,Koltz2018,BactNem,Nematodes
+Bactmite,3,deRuiter1994,Mite,Mite
+BactNem,3,deRuiter1994,BactNem,Nematodes
+BactNem,3,Holtkamp2011,BactNem,Nematodes
+Collembolans,3,Andres2016,Collembola,Collembola
+Crypmite,3,deRuiter1994,Mite,Mite
+Flagellates,3,Andres2016,Flagellates,SingleCellPred
+Flagellates,3,CPER,Flagellates,SingleCellPred
+Flagellates,3,Koltz2018,Flagellates,SingleCellPred
+Flagellates,3,deRuiter1994,Flagellates,SingleCellPred
+Flagellates,3,Holtkamp2011,Flagellates,SingleCellPred
+Fungcoll,3,deRuiter1994,Collembola,Collembola
+FungColl,3,Holtkamp2011,Collembola,Collembola
+FungCryAdultMite,3,Holtkamp2011,Mite,Mite
+FungCryJuvMite,3,Holtkamp2011,Mite,Mite
+Fungivorous Cryptostigmata,3,Andres2016,Mite,Mite
+Fungivorous nematodes,3,Andres2016,FungNem,Nematodes
+Fungivorous Prostigmata,3,Andres2016,Mite,Mite
+FungNem,3,deRuiter1994,FungNem,Nematodes
+FungNem,3,Holtkamp2011,FungNem,Nematodes
+FungNoncryMite,3,Holtkamp2011,Mite,Mite
+Ncrypmite,3,deRuiter1994,Mite,Mite
+Proturans,3,Andres2016,Pred,Pred
+Symphyla,3,Andres2016,Pred,Pred
+CanopyWebSpiders,3.489650699,Koltz2018,Pred,Pred
+Amoeba,3.5,Andres2016,Amoebae,SingleCellPred
+Amoebae,3.5,CPER,Amoebae,SingleCellPred
+Amoebae,3.5,Koltz2018,Amoebae,SingleCellPred
+Amoebae,3.5,deRuiter1994,Amoebae,SingleCellPred
+Amoebae,3.5,Holtkamp2011,Amoebae,SingleCellPred
+Rotifers,3.5,Koltz2018,Pred,Pred
+PredNem,3.583333333,deRuiter1994,PredNem,Nematodes
+Ciliates,3.625,Andres2016,Ciliates,SingleCellPred
+SurfaceWebSpiders,3.63794181,Koltz2018,Pred,Pred
+Nemmite,3.645833333,deRuiter1994,Mite,Mite
+Predcoll,3.645833333,deRuiter1994,Collembola,Collembola
+PredaceousBeetles,3.717074492,Koltz2018,Pred,Pred
+OmniNem,3.75,Holtkamp2011,OmniNem,Nematodes
+ParasiticWasps,3.767205592,Koltz2018,ParasiticWasps,ParasiticWasps
+Omnivorous nematodes,3.833333333,CPER,OmniNem,Nematodes
+OmnivorousNematodes,3.833333333,Koltz2018,OmniNem,Nematodes
+Predatory nematodes,3.833333333,CPER,PredNem,Nematodes
+OtherSurfaceActiveSpiders,3.892237835,Koltz2018,Pred,Pred
+WolfSpiders,3.892237835,Koltz2018,Pred,Pred
+Tardigrades,3.898148148,Koltz2018,Pred,Pred
+PredNem,3.9375,Holtkamp2011,PredNem,Nematodes
+CrabSpiders,3.943790126,Koltz2018,Pred,Pred
+Predatory mites,3.966666667,CPER,Mite,Mite
+Predmite,3.9875,deRuiter1994,Mite,Mite
+Predaceous dilurans,4,Andres2016,Pred,Pred
+Predaceous nematodes,4.0078125,Andres2016,PredNem,Nematodes
+Omnivorous nematodes,4.03125,Andres2016,OmniNem,Nematodes
+Nematophagous mites,4.033333333,CPER,Mite,Mite
+PredatoryNematodes,4.055555556,Koltz2018,PredNem,Nematodes
+PredColl,4.0859375,Holtkamp2011,Collembola,Collembola
+PredatoryMites,4.100154321,Koltz2018,Mite,Mite
+NemMite,4.1375,Holtkamp2011,Mite,Mite
+Cilliates,4.166666667,Koltz2018,Ciliates,SingleCellPred
+Nematophagous mites,4.2078125,Andres2016,Mite,Mite
+NematophagousMites,4.214506173,Koltz2018,Mite,Mite
+Predaceous mites,4.227475248,Andres2016,Mite,Mite
+PredMite,4.29109375,Holtkamp2011,Mite,Mite
