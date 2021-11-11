@@ -27,7 +27,7 @@ res1 = expand.grid(1:100/100,1:100/100)
 res2 = res1
 
 for(i in 1:dim(res1)[1]){
-  res2[i,] = ccxf(as.numeric(res1[i,]), ccx = CPER)
+  res2[i,] = ccxf(as.numeric(res1[i,]), ccx = Hunt1987)
 }
 
 res = cbind(res1, res2)
@@ -36,7 +36,7 @@ colnames(res) = c("p1", "p2", "Cmin", "Nmin")
 # Build range:
 
 buildrange1 = function(X, Y){
-  (ccxf(c(X, Y), CPER)[1] - ccxf(c(0.3, 0.3), CPER)[1])^2
+  (ccxf(c(X, Y), Hunt1987)[1] - ccxf(c(0.3, 0.3), Hunt1987)[1])^2
 }
 
 res3 = data.frame(p2 = 1:100/100,
@@ -59,7 +59,7 @@ gg = tibble(res) %>%
 ff = tibble(res) %>%
   filter(p1 == round(p1, digits = 1) & 
            p2 == round(p2, digits = 1)) %>%
-  ggplot(aes(x = Cmin, y = Nmin, color = p2, fill = p1))+ geom_hline(yintercept = sum(comana(corrstoich(CPER))$Nmin), linetype = 2)+ geom_vline(xintercept = sum(comana(corrstoich(CPER))$Cmin), linetype = 2) + geom_point(shape = 21, size = 2) + theme_classic() + scale_color_viridis_c(name = "Prod. eff.\nFungi (boarder)", option = "C") + scale_fill_gradient(name = "Prod. eff.\nBacteria (fill)", low = "grey80", high = "grey10")
+  ggplot(aes(x = Cmin, y = Nmin, color = p2, fill = p1))+ geom_hline(yintercept = sum(comana(corrstoich(Hunt1987))$Nmin), linetype = 2)+ geom_vline(xintercept = sum(comana(corrstoich(Hunt1987))$Cmin), linetype = 2) + geom_point(shape = 21, size = 2) + theme_classic() + scale_color_viridis_c(name = "Prod. eff.\nFungi (boarder)", option = "C") + scale_fill_gradient(name = "Prod. eff.\nBacteria (fill)", low = "grey80", high = "grey10")
 
 png("Plots/demonstration_fitting.png", width = 10, height = 4, units = "in", res = 600)
 ggpubr::ggarrange(

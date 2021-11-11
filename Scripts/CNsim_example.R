@@ -16,7 +16,7 @@ p_load(soilfoodwebs,tidyverse)
 # Use the CPER food web as an example:
 
 # Create a list of 100 communities for CPER:
-several_comms <- parameter_uncertainty(CPER, returnprops = T) # Return the communities for further analyses.
+several_comms <- parameter_uncertainty(Hunt1987, returnprops = T) # Return the communities for further analyses.
 
 # Select only the communities:
 several_comms = several_comms$communitylist
@@ -42,7 +42,7 @@ CPER_CNsim <- function(COMMin){
 }
 
 # Combine by trophic level:
-groupdf = data.frame(TLcheddar(CPER$imat))
+groupdf = data.frame(TLcheddar(Hunt1987$imat))
 
 groupdf = cbind(groupdf,ID = rownames(groupdf))
 rownames(groupdf)= NULL
@@ -51,7 +51,7 @@ colnames(groupdf) = c("TL", "name")
 
 groupdf$TL = ifelse(round(groupdf$TL, 1) > 2.5, "3+", round(groupdf$TL, 1))
 
-CPERmod = comtrosp(CPER, selected = groupdf$name[groupdf$TL == 2.5])
+CPERmod = comtrosp(Hunt1987, selected = groupdf$name[groupdf$TL == 2.5])
 
 CPERmod = comtrosp(CPERmod, selected = groupdf$name[groupdf$TL == "3+"])
 
@@ -130,7 +130,7 @@ CPERfull <- CPERres %>%
       mutate(Model = "Simple")
   )
 
-CPERexample <- CPER_CNsim(CPER) %>%
+CPERexample <- CPER_CNsim(Hunt1987) %>%
   separate(name, into = c('ID', NA), sep = "_") %>%
   left_join(
     groupsCPER
@@ -179,7 +179,7 @@ CPERfull %>%
 dev.off()  
 
 # Explore the oscillations by individual species:
-CPER_explore_ind <- CPER_CNsim(CPER) %>%
+CPER_explore_ind <- CPER_CNsim(Hunt1987) %>%
   separate(name, into = c('ID', NA), sep = "_")
 
 CPER_explore_ind %>%

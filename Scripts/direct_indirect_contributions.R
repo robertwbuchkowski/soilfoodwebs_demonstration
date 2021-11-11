@@ -148,9 +148,9 @@ puGA = parameter_uncertainty(usin = checkcomm(Koltz2018),
 puGA = do.call("rbind",puGA)
 results[[7]] = cbind(puGA, Web = "Koltz")
 
-# ... CPER web ----
+# ... Hunt1987 web ----
 
-puGA = parameter_uncertainty(usin = CPER,
+puGA = parameter_uncertainty(usin = Hunt1987,
                              errormeasure = 0.2,
                              errortype = "CV",
                              fcntorun = "whomineralizes", 
@@ -260,7 +260,7 @@ results2 <- do.call("rbind", results)
 
 rbind(
   cbind(TL = TLcheddar(Andres2016$GA$imat), Web = "Andres2016"),
-  cbind(TL = TLcheddar(CPER$imat), Web = "CPER"),
+  cbind(TL = TLcheddar(Hunt1987$imat), Web = "CPER"),
   cbind(TL = TLcheddar(Koltz2018$imat), Web = "Koltz2018"),
   cbind(TL = TLcheddar(deRuiter1994$CON$imat), Web = "deRuiter1994"),
   cbind(TL = TLcheddar(Holtkamp2011$Young$imat), Web = "Holtkamp2011")
