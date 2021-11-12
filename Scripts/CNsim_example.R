@@ -51,11 +51,11 @@ colnames(groupdf) = c("TL", "name")
 
 groupdf$TL = ifelse(round(groupdf$TL, 1) > 2.5, "3+", round(groupdf$TL, 1))
 
-CPERmod = comtrosp(Hunt1987, selected = groupdf$name[groupdf$TL == 2.5])
+CPERmod = comtrosp(Hunt1987, selected = groupdf$name[groupdf$TL == 2.5], newname = "TL2.5")
 
-CPERmod = comtrosp(CPERmod, selected = groupdf$name[groupdf$TL == "3+"])
+CPERmod = comtrosp(CPERmod, selected = groupdf$name[groupdf$TL == "3+"], newname = "TL3plus")
 
-CPERmod = comtrosp(CPERmod, selected = c(groupdf$name[groupdf$TL == 2][2:3],groupdf$name[groupdf$TL == 1][1]))
+CPERmod = comtrosp(CPERmod, selected = c(groupdf$name[groupdf$TL == 2][2:3],groupdf$name[groupdf$TL == 1][1]), newname = "Microbes")
 
 comana(CPERmod, mkplot = T, whattoplot = "web")
 
@@ -71,7 +71,6 @@ several_comms2 <- parameter_uncertainty(CPERmod, returnprops = T) # Return the c
 
 # Select only the communities:
 several_comms2 = several_comms2$communitylist
-
 
 CPERmod_CNsim <- function(COMMin){
   baseline <- CNsim(COMMin, start_mod = c(1,1,1,1,1.1,1))
@@ -172,9 +171,11 @@ CPERfull %>%
   filter(!(TL %in% c("Phytophagousnematodes", "Roots"))) %>%
   select(-RunID) %>%
   pivot_wider(names_from = Type) %>%
+  mutate(run = ifelse(run == "base", "Density-independent", run)) %>%
   ggplot(aes(x = Day, fill = run, group = paste0(run, Model))) + geom_ribbon(aes(ymin = Min, ymax = Max), alpha = 0.4) + facet_grid(TL~Model, scales = "free") + theme_classic() + scale_fill_manual(values = c("blue", "orange")) + scale_color_manual(values = c("blue", "orange")) +
   geom_line(aes(y = value, color = run),
             data = CPERexample %>%
+              mutate(run = ifelse(run == "base", "Density-independent", run))%>%
               filter(!(TL %in% c("Phytophagousnematodes", "Roots"))) ) + ylab("Biomass (Kg[C] per ha)") + xlab("Year")
 dev.off()  
 
