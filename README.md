@@ -8,3 +8,4 @@ A repository of R code demonstrating the functions in soilfoodwebs
 1. CN_sim_computation_time returns Figure A1 and shows two examples of simulation time for the function CNsim.
 1. decompexpt_example returns Figure 1 showing a decomposition experiment over time and the effects of oribatids on the decomposition rate in the Holtkamp food web.
 1. fitting_model_example returns Figure A2 and shows an example of fitting the bacterial and fungal production efficiency assuming that the default parameters in the CPER are the 'true' parameters.
+1. parameter_uncertainty_example returns the Figure 1 showing how uncertainty in biomass estimates make some food webs undifferentiatable.
