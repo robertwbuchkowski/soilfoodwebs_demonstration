@@ -179,6 +179,38 @@ CPERfull %>%
               filter(!(TL %in% c("Phytophagousnematodes", "Roots"))) ) + ylab("Biomass (Kg[C] per ha)") + xlab("Year")
 dev.off()  
 
+
+png("Plots/demonstration_simulation_TL2pt5.png", width = 8, height = 4, units = "in", res = 600)
+CPERfull %>%
+  group_by(run, TL, RunID, Model) %>%
+  summarise(value = sum(value)) %>%
+  group_by(run, TL, Model) %>%
+  slice_min(order_by = value) %>%
+  mutate(Type = "Min") %>%
+  bind_rows(
+    CPERfull %>%
+      group_by(run, TL, RunID, Model) %>%
+      summarise(value = sum(value)) %>%
+      group_by(run, TL, Model) %>%
+      slice_max(order_by = value)%>%
+      mutate(Type = "Max")
+  ) %>%
+  select(-value) %>%
+  ungroup() %>%
+  left_join(
+    CPERfull, by = c("run", "TL", "RunID", "Model")
+  )%>%
+  filter(TL == "TL = 2.5") %>%
+  select(-RunID) %>%
+  pivot_wider(names_from = Type) %>%
+  mutate(run = ifelse(run == "base", "Density-independent", run)) %>%
+  ggplot(aes(x = Day, fill = run, group = paste0(run, Model))) + geom_ribbon(aes(ymin = Min, ymax = Max), alpha = 0.4) + facet_grid(.~Model, scales = "free") + theme_classic() + scale_fill_manual(values = c("blue", "orange")) + scale_color_manual(values = c("blue", "orange")) +
+  geom_line(aes(y = value, color = run),
+            data = CPERexample %>%
+              mutate(run = ifelse(run == "base", "Density-independent", run))%>%
+              filter(TL == "TL = 2.5") ) + ylab("Biomass (Kg[C] per ha)") + xlab("Year")
+dev.off()  
+
 # Explore the oscillations by individual species:
 CPER_explore_ind <- CPER_CNsim(Hunt1987) %>%
   separate(name, into = c('ID', NA), sep = "_")

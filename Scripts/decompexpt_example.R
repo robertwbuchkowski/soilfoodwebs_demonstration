@@ -121,6 +121,9 @@ results2 = do.call("rbind",results) %>%
   group_by(Day, Web) %>%
   summarize(m = mean(100*Original), sd = sd(100*Original)) 
 
+# Order the fields correctly:
+results2$Web = factor(results2$Web, levels = c("Young", "Mid", "Old", "Heathland"))
+
 Figure3A = results2 %>%
   ggplot(aes(x = Day, y = m, color = Web, fill = Web, group = Web)) + geom_line(lwd = 1.5) + theme_classic() + xlab("Year") + ylab("Detritus Remaining (%)") +
   geom_errorbar(aes(ymin = m -sd, ymax = m+sd),data = results2 %>%
@@ -148,6 +151,9 @@ results2 = do.call("rbind",results) %>%
   group_by(Day, Web) %>%
   summarize(m = mean(EOO), sd = sd(EOO)) 
 
+# Order the fields correctly:
+results2$Web = factor(results2$Web, levels = c("Young", "Mid", "Old", "Heathland"))
+
 Figure3B = results2 %>%
   ggplot(aes(x = Day, y = m, color = Web, fill = Web, group = Web)) + geom_line(lwd = 1.5) + theme_classic() + xlab("Year") + ylab("Effect of oribatids on remaining litter (%)") +
   geom_errorbar(aes(ymin = m -sd, ymax = m+sd),data = results2 %>%
@@ -164,7 +170,7 @@ Figure3B = results2 %>%
                            Day == 42 & Web == "Old"|
                            Day == 43 & Web == "Heathland") )
 
-png("Plots/demonstration_decomp.png", width = 8, height = 4, units = "in", res = 600)
+png("Plots/demonstration_decomp.png", width = 8, height = 4, units = "in", res = 1200)
 ggpubr::ggarrange(Figure3A,Figure3B, labels = "AUTO", common.legend = T)
 dev.off()
 # Get the biomass and relative biomass of oribatid mites in the different Holtkamp webs:

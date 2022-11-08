@@ -18,7 +18,7 @@ results = vector("list", length = 16)
 
 reps_per_web = 1000
 
-setseed(102132)
+set.seed(102132)
 
 # ... Andres et al. 2016----
 
@@ -137,6 +137,53 @@ puGA = parameter_uncertainty(usin = Andres2016$UGC,
 puGA = do.call("rbind",lapply(puGA, pullconsump))
 results[[6]] = cbind(as.data.frame(puGA), Web = "UGC")
 
+# META-SITE
+tempsite = Andres2016$GA
+tempsite$prop$B = apply(
+  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
+  1,
+  mean
+)
+
+temperror = matrix(data = apply(
+  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
+  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
+temperror["Roots","B"] = (3000*0.2)^2
+
+puGA = parameter_uncertainty(usin = tempsite,
+                             errormeasure = temperror,
+                             errortype = "Variance",
+                             fcntorun = "comana", 
+                             replicates = reps_per_web)
+
+
+puGA = do.call("rbind",lapply(puGA, pullconsump))
+results[[7]] = cbind(as.data.frame(puGA), Web = "GS")
+
+tempsite = Andres2016$UGA
+tempsite$prop$B = apply(
+  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
+  1,
+  mean
+)
+
+temperror = matrix(data = apply(
+  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
+  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
+temperror["Roots","B"] = (3000*0.2)^2
+
+puGA = parameter_uncertainty(usin = tempsite,
+                             errormeasure = temperror,
+                             errortype = "Variance",
+                             fcntorun = "comana", 
+                             replicates = reps_per_web)
+
+
+puGA = do.call("rbind",lapply(puGA, pullconsump))
+results[[8]] = cbind(as.data.frame(puGA), Web = "UGS")
+
+rm(tempsite, temperror)
+
 results2 = do.call("rbind", results)
 
 png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
@@ -144,8 +191,16 @@ results2 %>%
   tibble() %>%
   pivot_longer(-Web) %>%
   filter(grepl("nematode", name)) %>%
-  separate(Web, into = c("Grazed", "Site"), sep = -1) %>%
+  separate(Web, into = c("Grazed2", "Site2"), sep = -1) %>%
   separate(name, into = c("A", "B"), sep = -9) %>%
+  left_join(
+   tibble(Grazed2 = c("UG", "G"),
+          Treatment = c("Grazed", "Ungrazed")) 
+  ) %>%
+  left_join(
+    tibble(Site2 = c("A", "B", "C", "S"),
+           Site = factor(c("A", "B", "C", "All"), levels = c("A", "B", "C", "All")))
+  ) %>%
   mutate(name = paste(A, B)) %>%
-  ggplot(aes(x = Site, y = value, color = Grazed)) + stat_summary(fun.data = "mean_cl_boot") + facet_wrap(.~name, scales = "free") + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)"))
+  ggplot(aes(x = Site, y = value, color = Treatment)) + stat_summary(fun.data = "mean_cl_boot", shape = 1) + facet_wrap(.~name, scales = "free") + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)"))
 dev.off()
