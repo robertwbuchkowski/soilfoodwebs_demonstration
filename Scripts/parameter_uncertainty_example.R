@@ -389,6 +389,7 @@ results[[8]] = cbind(as.data.frame(puGA), Web = "UGS")
 
 rm(tempsite, temperror)
 
+
 # Holtkamp ------
 
 
@@ -453,6 +454,27 @@ results[[12]] = cbind(puGA, Web = "Heathland")
 # Summarize
 
 results2 = do.call("rbind", results)
+
+results2 = results2 %>% 
+  mutate(Manuscript = ifelse(Web %in% c("Young", "Mid", "Old", "Heathland"), "Holtkamp et al.", "Andres et al."))
+
+cowplot::plot_grid(
+  results2 %>%
+    tibble() %>%
+    ggplot(aes(x = Cmin, color = Web)) + geom_density() + theme_classic(),
+  
+  results2 %>%
+    tibble() %>%
+    ggplot(aes(x = Nmin, color = Web, linetype = Manuscript)) + geom_density() + theme_classic(),
+  
+  results2 %>%
+    tibble() %>%
+    ggplot(aes(x = DirectC, color = Web, linetype = Manuscript)) + geom_density() + theme_classic(),
+  
+  results2 %>%
+    tibble() %>%
+    ggplot(aes(x = DirectN, color = Web, linetype = Manuscript)) + geom_density() + theme_classic()
+)
 
 png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
 results2 %>%
