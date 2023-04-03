@@ -58,6 +58,12 @@ pulldata <- function(x){
   t1 = whomineralizes(tempcomb, selected = "Mite")
   names(t1) = paste0("Base_", names(t1))
   
+  t1a = decompexpt(x$usin, selected = "Proturans")$basedecomp
+  names(t1a) = c("Base_Fast", "Base_Slow")
+  t1a = data.frame(t(t1a))
+  
+  t1b = decompexpt(tempcomb, selected = "Mite")$decompeffects %>% pivot_longer(!ID & !DetritusID) %>% mutate(DetritusID = ifelse(DetritusID == "ActiveSOM", "Fast", "Slow")) %>% mutate(name = paste0("Base_",DetritusID, "/", name)) %>% select(-DetritusID) %>% pivot_wider() %>% as.data.frame()
+  
   tempcomb = comtrosp(tempcomb, selected = c("Bacteriophagousnematodes","Fungivorousnematodes","Omnivorousnematodes", "Phytophagousnematodes", "Predaceousnematodes"), newname = "Nematode", allFEEDING1 = T,deleteCOMBOcannibal = T)
   
   tempcomb = comtrosp(tempcomb, selected = c("Ciliates", "Flagellates", "Amoeba"), newname = "Protist", allFEEDING1 = T,deleteCOMBOcannibal = T)
@@ -65,10 +71,35 @@ pulldata <- function(x){
   t2 = whomineralizes(tempcomb, selected = "Mite")
   names(t2) = paste0("Mod_", names(t2))
   
+  t2a = decompexpt(tempcomb, selected = "Proturans")$basedecomp
+  names(t2a) = c("Mod_Fast", "Mod_Slow")
+  t2a = data.frame(t(t2a))
+  
+  t2b = decompexpt(tempcomb, selected = "Mite")$decompeffects %>% pivot_longer(!ID & !DetritusID) %>% mutate(DetritusID = ifelse(DetritusID == "ActiveSOM", "Fast", "Slow")) %>% mutate(name = paste0("Mod_",DetritusID, "/", name)) %>% select(-DetritusID) %>% pivot_wider() %>% as.data.frame()
   
   t3 = comana(tempcomb)
 
-  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1])
+  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1], t1a, t1b[,-1], t2a, t2b[,-1])
+}
+
+CNsim(Andres2016$GB, start_mod = c(rep(1, 19), 1.1, 1), TIMES = 1:10)
+
+CPER_CNsim <- function(COMMin){
+  baseline <- CNsim(COMMin, start_mod = c(rep(1, 19), 1.1, 1))
+  
+  ddrun <- CNsim(COMMin, start_mod = c(rep(1, 20), 1.1, 1),
+                 densitydependence = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0))
+  
+  return(baseline %>% tibble() %>%
+           pivot_longer(-Day) %>%
+           filter(grepl("_Carbon", name)) %>%
+           mutate(run = "base") %>%
+           bind_rows(
+             ddrun %>% tibble() %>%
+               pivot_longer(-Day) %>%
+               filter(grepl("_Carbon", name)) %>%
+               mutate(run = "Density-dependent")
+           )) 
 }
 
 puGA = do.call("rbind",lapply(puGA, pulldata))
@@ -163,6 +194,12 @@ pulldata <- function(x){
   t1 = whomineralizes(tempcomb, selected = "Mite")
   names(t1) = paste0("Base_", names(t1))
   
+  t1a = decompexpt(x$usin, selected = "Amoebae")$basedecomp[-1] # Get rid of the sugars
+  names(t1a) = c("Base_Fast", "Base_Slow")
+  t1a = data.frame(t(t1a))
+  
+  t1b = decompexpt(tempcomb, selected = "Mite")$decompeffects[-1,] %>% pivot_longer(!ID & !DetritusID) %>% mutate(DetritusID = ifelse(DetritusID == "LabileOM", "Fast", "Slow")) %>% mutate(name = paste0("Base_",DetritusID, "/", name)) %>% select(-DetritusID) %>% pivot_wider() %>% as.data.frame()
+  
   tempcomb = comtrosp(tempcomb, selected = c("BactNem","FungNem","OmniNem", "PhytoNem", "PredNem"), newname = "Nematode", allFEEDING1 = T,deleteCOMBOcannibal = T)
   
   tempcomb = comtrosp(tempcomb, selected = c("PredColl", "FungColl"), newname = "Collembola", allFEEDING1 = T,deleteCOMBOcannibal = T)
@@ -172,10 +209,15 @@ pulldata <- function(x){
   t2 = whomineralizes(tempcomb, selected = "Mite")
   names(t2) = paste0("Mod_", names(t2))
   
+  t2a = decompexpt(tempcomb, selected = "Protist")$basedecomp[-1]# Get rid of the sugars
+  names(t2a) = c("Mod_Fast", "Mod_Slow")
+  t2a = data.frame(t(t2a))
+  
+  t2b = decompexpt(tempcomb, selected = "Mite")$decompeffects[-1,] %>% pivot_longer(!ID & !DetritusID) %>% mutate(DetritusID = ifelse(DetritusID == "LabileOM", "Fast", "Slow")) %>% mutate(name = paste0("Mod_",DetritusID, "/", name)) %>% select(-DetritusID) %>% pivot_wider() %>% as.data.frame()
   
   t3 = comana(tempcomb)
   
-  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1])
+  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1], t1a, t1b[,-1], t2a, t2b[,-1])
 }
 
 
@@ -226,19 +268,30 @@ pulldata <- function(x){
   t1 = whomineralizes(tempcomb, selected = "Mite")
   names(t1) = paste0("Base_", names(t1))
   
+  t1a = decompexpt(x$usin, selected = "Amoebae")$basedecomp[-1] # Get rid of the sugars
+  names(t1a) = c("Base_Fast", "Base_Slow")
+  t1a = data.frame(t(t1a))
+  
+  t1b = decompexpt(tempcomb, selected = "Mite")$decompeffects[-1,] %>% pivot_longer(!ID & !DetritusID) %>% mutate(DetritusID = ifelse(DetritusID == "LabileOM", "Fast", "Slow")) %>% mutate(name = paste0("Base_",DetritusID, "/", name)) %>% select(-DetritusID) %>% pivot_wider() %>% as.data.frame()
+  
   tempcomb = comtrosp(tempcomb, selected = c("BactNem","FungNem","OmniNem", "PhytoNem", "PredNem"), newname = "Nematode", allFEEDING1 = T,deleteCOMBOcannibal = T)
-
-  # No need for collembola, because no predatory collembola at this site
+  
+  # No need to to Collembola because there are no predators at this site.
   
   tempcomb = comtrosp(tempcomb, selected = c("Flagellates", "Amoebae"), newname = "Protist", allFEEDING1 = T,deleteCOMBOcannibal = T)
   
   t2 = whomineralizes(tempcomb, selected = "Mite")
   names(t2) = paste0("Mod_", names(t2))
   
+  t2a = decompexpt(tempcomb, selected = "Protist")$basedecomp[-1]# Get rid of the sugars
+  names(t2a) = c("Mod_Fast", "Mod_Slow")
+  t2a = data.frame(t(t2a))
+  
+  t2b = decompexpt(tempcomb, selected = "Mite")$decompeffects[-1,] %>% pivot_longer(!ID & !DetritusID) %>% mutate(DetritusID = ifelse(DetritusID == "LabileOM", "Fast", "Slow")) %>% mutate(name = paste0("Mod_",DetritusID, "/", name)) %>% select(-DetritusID) %>% pivot_wider() %>% as.data.frame()
   
   t3 = comana(tempcomb)
   
-  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1])
+  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1], t1a, t1b[,-1], t2a, t2b[,-1])
 }
 
 errmes2 <- as.matrix(errmes[-3,"Old"])
@@ -264,18 +317,35 @@ results2 = results2 %>%
   mutate(Manuscript = ifelse(Web %in% c("Young", "Mid", "Old", "Heathland"), "Holtkamp et al.", "Andres et al.")) %>%
   mutate(Web = factor(Web, levels = c("Young", "Mid", "Old", "Heathland", "GA", "UGA", "GB", "UGB", "GC", "UGC")))
 
-png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
-cowplot::plot_grid(
+png("Plots/demonstration_parameteruncertainty.png", width = 10, height = 11, units = "in", res = 600)
+ggpubr::ggarrange(
   results2 %>%
     filter(name %in% c("Cmin", "Nmin")) %>%
     mutate(name = ifelse(name == "Cmin", "Carbon", "Nitrogen")) %>%
     mutate(Structure = ifelse(Structure == "Base", "Original", "Grouped")) %>%
-    ggplot(aes(x = Web, y = value, color = Structure, linetype = Manuscript)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Nutrient~mineralization~(kg[Nutrient]~ha^-1~yr^-1)")),
+    mutate(Structure = factor(Structure, levels = c("Original", "Grouped"))) %>%
+    ggplot(aes(x = Web, y = value, color = Structure)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Mineralization~(kg[Nutrient]~ha^-1~yr^-1)")) + geom_vline(xintercept = 4.5, linetype = 2, color = "grey"),
+  
+  results2 %>%
+    filter(name %in% c("Fast", "Slow")) %>%
+    mutate(name = ifelse(name == "Fast", "Fast litter decomposition", "Slow litter decomposition")) %>%
+    mutate(Structure = ifelse(Structure == "Base", "Original", "Grouped")) %>%
+    mutate(Structure = factor(Structure, levels = c("Original", "Grouped"))) %>%
+    ggplot(aes(x = Web, y = value, color = Structure)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Decomposition~(yr^-1)")) + geom_vline(xintercept = 4.5, linetype = 2, color = "grey"),
   
   results2 %>%
     filter(name %in% c("DirectC", "IndirectC")) %>%
-    mutate(name = ifelse(name == "DirectC", "Mite direct effect", "Mite indirect effect")) %>%
+    mutate(name = ifelse(name == "DirectC", "Mite direct effect on carbon", "Mite indirect effect on carbon")) %>%
     mutate(Structure = ifelse(Structure == "Base", "Original", "Grouped")) %>%
-    ggplot(aes(x = Web, y = value, color = Structure, linetype = Manuscript)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Effect~(proportion)"))
+    mutate(Structure = factor(Structure, levels = c("Original", "Grouped"))) %>%
+    ggplot(aes(x = Web, y = value, color = Structure)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Effect~(proportion)")) + geom_vline(xintercept = 4.5, linetype = 2, color = "grey"),
+  
+  results2 %>%
+    filter(name %in% c("Fast/Indirect", "Slow/Indirect")) %>%
+    mutate(name = ifelse(name == "Fast/Indirect", "Mite indirect effect on fast litter decomposition", "Mite indirect effect on slow litter decomposition")) %>%
+    mutate(Structure = ifelse(Structure == "Base", "Original", "Grouped")) %>%
+    mutate(Structure = factor(Structure, levels = c("Original", "Grouped"))) %>%
+    ggplot(aes(x = Web, y = value, color = Structure)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Effect~(proportion)")) + geom_vline(xintercept = 4.5, linetype = 2, color = "grey"),
+  ncol = 1,common.legend = T
 )
 dev.off()
