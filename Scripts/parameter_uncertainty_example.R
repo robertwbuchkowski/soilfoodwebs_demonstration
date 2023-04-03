@@ -52,17 +52,26 @@ puGA = parameter_uncertainty(usin = Andres2016$GA,
                              fcntorun = "comana", 
                              replicates = reps_per_web)
 
-pullconsump <- function(x) c(Cmin = sum(x$Cmin), Nmin = sum(x$Nmin))
+pulldata <- function(x){
+  tempcomb = comtrosp(x$usin, selected = c("FungivorousCryptostigmata", "FungivorousProstigmata", "Nematophagousmites", "Predaceousmites"), newname = "Mite", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  t1 = whomineralizes(tempcomb, selected = "Mite")
+  names(t1) = paste0("Base_", names(t1))
+  
+  tempcomb = comtrosp(tempcomb, selected = c("Bacteriophagousnematodes","Fungivorousnematodes","Omnivorousnematodes", "Phytophagousnematodes", "Predaceousnematodes"), newname = "Nematode", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  tempcomb = comtrosp(tempcomb, selected = c("Ciliates", "Flagellates", "Amoeba"), newname = "Protist", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  t2 = whomineralizes(tempcomb, selected = "Mite")
+  names(t2) = paste0("Mod_", names(t2))
+  
+  
+  t3 = comana(tempcomb)
 
-pullwhomins <- function(x){
-  t1 = whomineralizes(x$usin)
-  colSums(t1[t1$ID %in% c("Predaceousmites"),c(2,4)])
-  }
+  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1])
+}
 
-comtrosp(puGA[[1]]$usin, selected = c("Bacteriophagousnematodes","Fungivorousnematodes","Omnivorousnematodes", "Phytophagousnematodes"))
-
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 
 results[[1]] = cbind(as.data.frame(puGA), Web = "GA")
 
@@ -79,8 +88,7 @@ puGA = parameter_uncertainty(usin = Andres2016$UGA,
                              replicates = reps_per_web)
 
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[2]] = cbind(as.data.frame(puGA), Web = "UGA")
 
 # SITE B
@@ -96,8 +104,7 @@ puGA = parameter_uncertainty(usin = Andres2016$GB,
                              replicates = reps_per_web)
 
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[3]] = cbind(as.data.frame(puGA), Web = "GB")
 
 
@@ -113,8 +120,7 @@ puGA = parameter_uncertainty(usin = Andres2016$UGB,
                              replicates = reps_per_web)
 
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[4]] = cbind(as.data.frame(puGA), Web = "UGB")
 
 # SITE C
@@ -130,8 +136,7 @@ puGA = parameter_uncertainty(usin = Andres2016$GC,
                              replicates = reps_per_web)
 
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[5]] = cbind(as.data.frame(puGA), Web = "GC")
 
 
@@ -147,11 +152,31 @@ puGA = parameter_uncertainty(usin = Andres2016$UGC,
                              replicates = reps_per_web)
 
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[6]] = cbind(as.data.frame(puGA), Web = "UGC")
 
 # Holtkamp ------
+
+pulldata <- function(x){
+  tempcomb = comtrosp(x$usin, selected = c("FungCryJuvMite","FungCryAdultMite", "FungNoncryMite", "NemMite", "PredMite"), newname = "Mite", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  t1 = whomineralizes(tempcomb, selected = "Mite")
+  names(t1) = paste0("Base_", names(t1))
+  
+  tempcomb = comtrosp(tempcomb, selected = c("BactNem","FungNem","OmniNem", "PhytoNem", "PredNem"), newname = "Nematode", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  tempcomb = comtrosp(tempcomb, selected = c("PredColl", "FungColl"), newname = "Collembola", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  tempcomb = comtrosp(tempcomb, selected = c("Flagellates", "Amoebae"), newname = "Protist", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  t2 = whomineralizes(tempcomb, selected = "Mite")
+  names(t2) = paste0("Mod_", names(t2))
+  
+  
+  t3 = comana(tempcomb)
+  
+  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1])
+}
 
 
 # Load in errors, convert SD to VAR
@@ -168,8 +193,7 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Young,
                              fcntorun = "comana", 
                              replicates = reps_per_web)
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[7]] = cbind(as.data.frame(puGA), Web = "Young")
 
 errmes2 <- as.matrix(errmes[,"Mid"])
@@ -181,22 +205,8 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Mid,
                              fcntorun = "comana", 
                              replicates = reps_per_web)
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[8]] = cbind(as.data.frame(puGA), Web = "Mid")
-
-errmes2 <- as.matrix(errmes[-3,"Old"])
-colnames(errmes2) = "B"
-
-puGA = parameter_uncertainty(usin = Holtkamp2011$Old,
-                             errormeasure = errmes2,
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
-results[[9]] = cbind(as.data.frame(puGA), Web = "Old")
 
 errmes2 <- as.matrix(errmes[,"Health"])
 colnames(errmes2) = "B"
@@ -207,49 +217,65 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Heathland,
                              fcntorun = "comana", 
                              replicates = reps_per_web)
 
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
+puGA = do.call("rbind",lapply(puGA, pulldata))
 results[[10]] = cbind(as.data.frame(puGA), Web = "Heathland")
+
+pulldata <- function(x){
+  tempcomb = comtrosp(x$usin, selected = c("FungCryJuvMite","FungCryAdultMite", "FungNoncryMite", "NemMite", "PredMite"), newname = "Mite", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  t1 = whomineralizes(tempcomb, selected = "Mite")
+  names(t1) = paste0("Base_", names(t1))
+  
+  tempcomb = comtrosp(tempcomb, selected = c("BactNem","FungNem","OmniNem", "PhytoNem", "PredNem"), newname = "Nematode", allFEEDING1 = T,deleteCOMBOcannibal = T)
+
+  # No need for collembola, because no predatory collembola at this site
+  
+  tempcomb = comtrosp(tempcomb, selected = c("Flagellates", "Amoebae"), newname = "Protist", allFEEDING1 = T,deleteCOMBOcannibal = T)
+  
+  t2 = whomineralizes(tempcomb, selected = "Mite")
+  names(t2) = paste0("Mod_", names(t2))
+  
+  
+  t3 = comana(tempcomb)
+  
+  cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1])
+}
+
+errmes2 <- as.matrix(errmes[-3,"Old"])
+colnames(errmes2) = "B"
+
+puGA = parameter_uncertainty(usin = Holtkamp2011$Old,
+                             errormeasure = errmes2,
+                             errortype = "Variance",
+                             fcntorun = "comana", 
+                             replicates = reps_per_web)
+
+puGA = do.call("rbind",lapply(puGA, pulldata))
+results[[9]] = cbind(as.data.frame(puGA), Web = "Old")
 
 # Summarize
 
 results2 = do.call("rbind", results)
 
-results2 = results2 %>% 
+results2 = results2 %>%
+  mutate(UID = 1:dim(.)[1]) %>%
+  pivot_longer(!Web & !UID) %>%
+  separate(name, into = c("Structure", "name"), sep = "_") %>%
   mutate(Manuscript = ifelse(Web %in% c("Young", "Mid", "Old", "Heathland"), "Holtkamp et al.", "Andres et al.")) %>%
   mutate(Web = factor(Web, levels = c("Young", "Mid", "Old", "Heathland", "GA", "UGA", "GB", "UGB", "GC", "UGC")))
 
+png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
 cowplot::plot_grid(
   results2 %>%
-    tibble() %>%
-    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic(),
+    filter(name %in% c("Cmin", "Nmin")) %>%
+    mutate(name = ifelse(name == "Cmin", "Carbon", "Nitrogen")) %>%
+    mutate(Structure = ifelse(Structure == "Base", "Original", "Grouped")) %>%
+    ggplot(aes(x = Web, y = value, color = Structure, linetype = Manuscript)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Nutrient~mineralization~(kg[Nutrient]~ha^-1~yr^-1)")),
   
   results2 %>%
-    tibble() %>%
-    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic(),
-  
-  results2 %>%
-    tibble() %>%
-    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic(),
-  
-  results2 %>%
-    tibble() %>%
-    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic()
+    filter(name %in% c("DirectC", "IndirectC")) %>%
+    mutate(name = ifelse(name == "DirectC", "Mite direct effect", "Mite indirect effect")) %>%
+    mutate(Structure = ifelse(Structure == "Base", "Original", "Grouped")) %>%
+    ggplot(aes(x = Web, y = value, color = Structure, linetype = Manuscript)) + geom_boxplot() + theme_classic() + facet_wrap(.~name, scales = "free") +  ylab(parse(text = "Effect~(proportion)"))
 )
-
-png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
-results2 %>%
-  tibble() %>%
-  pivot_longer(-Web) %>%
-  separate(Web, into = c("Grazed2", "Site2"), sep = -1) %>%
-  left_join(
-    tibble(Grazed2 = c("G", "UG"),
-           Treatment = c("Grazed", "Ungrazed")) 
-  ) %>%
-  left_join(
-    tibble(Site2 = c("A", "B", "C", "S"),
-           Site = factor(c("A", "B", "C", "All"), levels = c("A", "B", "C", "All")))
-  ) %>%
-  mutate(Site = paste0(Site, "-", Grazed2)) %>%
-  ggplot(aes(x = Site, y = value, color = Treatment)) + geom_boxplot() + facet_wrap(.~name, scales = "free") + theme_classic() + ylab(parse(text = "Nutrient~mineralization~(kg[Nutrient]~ha^-1~yr^-1)"))
 dev.off()
