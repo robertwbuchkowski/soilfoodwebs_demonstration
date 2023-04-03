@@ -11,6 +11,31 @@ if(F){
 if (!require("pacman")) install.packages("pacman")
 p_load(soilfoodwebs,tidyverse)
 
+
+
+CNsim_custom <- function(x){
+  tt1 = CNsim(x, start_mod = c(rep(1, 19), 1.1, 1), TIMES = 1:10)
+  
+  tt2 = CNsim(x, start_mod = c(rep(1, 19), 1.1, 1), TIMES = 1:10,
+              densitydependence = c(0,rep(1, 17),0,0,1))
+  
+  tt1 = tt1 %>% tibble() %>% select(Day, contains("_Cmin")) %>%
+    pivot_longer(!Day) %>%
+    group_by(Day) %>%
+    summarize(Base_Cmin = sum(value)) %>%
+    ungroup() %>%
+    left_join(
+      tt2 %>% tibble() %>% select(Day, contains("_Cmin")) %>%
+        pivot_longer(!Day) %>%
+        group_by(Day) %>%
+        summarize(DD_Cmin = sum(value)) %>%
+        ungroup(), by = c("Day")
+    )
+  return(tt1)
+}
+
+CNsim_custom(Andres2016$GB)
+
 # CNsim and the effects of density-dependence ----
 
 # Use the CPER food web as an example:

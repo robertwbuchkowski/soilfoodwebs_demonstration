@@ -14,9 +14,9 @@ p_load(soilfoodwebs,tidyverse)
 # Calculate total carbon and nitrogen mineralization across the webs ----
 
 # Create a list to store all the results:
-results = vector("list", length = 16)
+results = vector("list", length = 9)
 
-reps_per_web = 10
+reps_per_web = 1000
 
 set.seed(102132)
 
@@ -80,26 +80,6 @@ pulldata <- function(x){
   t3 = comana(tempcomb)
 
   cbind(Base_Cmin = sum(x$Cmin), Base_Nmin = sum(x$Nmin),Mod_Cmin = sum(t3$Cmin), Mod_Nmin = sum(t3$Nmin),t1[,-1],t2[,-1], t1a, t1b[,-1], t2a, t2b[,-1])
-}
-
-CNsim(Andres2016$GB, start_mod = c(rep(1, 19), 1.1, 1), TIMES = 1:10)
-
-CPER_CNsim <- function(COMMin){
-  baseline <- CNsim(COMMin, start_mod = c(rep(1, 19), 1.1, 1))
-  
-  ddrun <- CNsim(COMMin, start_mod = c(rep(1, 20), 1.1, 1),
-                 densitydependence = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0))
-  
-  return(baseline %>% tibble() %>%
-           pivot_longer(-Day) %>%
-           filter(grepl("_Carbon", name)) %>%
-           mutate(run = "base") %>%
-           bind_rows(
-             ddrun %>% tibble() %>%
-               pivot_longer(-Day) %>%
-               filter(grepl("_Carbon", name)) %>%
-               mutate(run = "Density-dependent")
-           )) 
 }
 
 puGA = do.call("rbind",lapply(puGA, pulldata))
