@@ -11,203 +11,12 @@ if(F){
 if (!require("pacman")) install.packages("pacman")
 p_load(soilfoodwebs,tidyverse)
 
-# Calculate the contributions to mineralization of trophic groups across the food webs----
-
-# Create a list to store all the results:
-results = vector("list", length = 16)
-
-reps_per_web = 1000
-
-set.seed(102132)
-
-# ... Andres et al. 2016----
-
-# Because only biomass changes between the communities, we can use this baseline community and cycle through the mean biomass random draws.
-
-# Load in the file of biomasses and standard errors:
-biomasses = read_csv("Data/Andres/biomass_sd.csv") %>%
-  # Convert to gamma distribution:
-  mutate(n = ifelse(grepl("SOM", ID),3,10)) %>%
-  mutate(Bvar = n*SE^2) %>%
-  filter(ID != "Totalinvertebrate biomass")
-
-biomasses = biomasses %>%
-  filter(ID == "ActiveSOM") %>%
-  mutate(ID = "Roots") %>%
-  mutate(Bvar = (3000*0.2)^2) %>%
-  bind_rows(
-    biomasses
-  ) %>%
-  select(ID, name, Bvar) %>% rename(B = Bvar)
-
-# SITE A
-biomassescur = biomasses %>% filter(name == "A_G") %>%
-  select(-name) %>% data.frame()
-
-puGA = parameter_uncertainty(usin = Andres2016$GA,
-                             errormeasure = 
-                               matrix(data = biomassescur$B, nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(biomassescur$ID, "B")),
-                             
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-pullconsump <- function(x) x$consumption
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[1]] = cbind(as.data.frame(puGA), Web = "GA")
-
-
-biomassescur = biomasses %>% filter(name == "A_UG") %>%
-  select(-name) %>% data.frame()
-
-puGA = parameter_uncertainty(usin = Andres2016$UGA,
-                             errormeasure = 
-                               matrix(data = biomassescur$B, nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(biomassescur$ID, "B")),
-                             
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[2]] = cbind(as.data.frame(puGA), Web = "UGA")
-
-# SITE B
-biomassescur = biomasses %>% filter(name == "B_G") %>%
-  select(-name) %>% data.frame()
-
-puGA = parameter_uncertainty(usin = Andres2016$GB,
-                             errormeasure = 
-                               matrix(data = biomassescur$B, nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(biomassescur$ID, "B")),
-                             
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[3]] = cbind(as.data.frame(puGA), Web = "GB")
-
-
-biomassescur = biomasses %>% filter(name == "B_UG") %>%
-  select(-name) %>% data.frame()
-
-puGA = parameter_uncertainty(usin = Andres2016$UGB,
-                             errormeasure = 
-                               matrix(data = biomassescur$B, nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(biomassescur$ID, "B")),
-                             
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[4]] = cbind(as.data.frame(puGA), Web = "UGB")
-
-# SITE C
-biomassescur = biomasses %>% filter(name == "C_G") %>%
-  select(-name) %>% data.frame()
-
-puGA = parameter_uncertainty(usin = Andres2016$GC,
-                             errormeasure = 
-                               matrix(data = biomassescur$B, nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(biomassescur$ID, "B")),
-                             
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[5]] = cbind(as.data.frame(puGA), Web = "GC")
-
-
-biomassescur = biomasses %>% filter(name == "C_UG") %>%
-  select(-name) %>% data.frame()
-
-puGA = parameter_uncertainty(usin = Andres2016$UGC,
-                             errormeasure = 
-                               matrix(data = biomassescur$B, nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(biomassescur$ID, "B")),
-                             
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[6]] = cbind(as.data.frame(puGA), Web = "UGC")
-
-# META-SITE
-tempsite = Andres2016$GA
-tempsite$prop$B = apply(
-  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
-  1,
-  mean
-)
-
-temperror = matrix(data = apply(
-  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
-  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
-temperror["Roots","B"] = (3000*0.2)^2
-
-puGA = parameter_uncertainty(usin = tempsite,
-                             errormeasure = temperror,
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[7]] = cbind(as.data.frame(puGA), Web = "GS")
-
-tempsite = Andres2016$UGA
-tempsite$prop$B = apply(
-  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
-  1,
-  mean
-)
-
-temperror = matrix(data = apply(
-  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
-  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
-temperror["Roots","B"] = (3000*0.2)^2
-
-puGA = parameter_uncertainty(usin = tempsite,
-                             errormeasure = temperror,
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[8]] = cbind(as.data.frame(puGA), Web = "UGS")
-
-rm(tempsite, temperror)
-
-results2 = do.call("rbind", results)
-
-png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
-results2 %>%
-  tibble() %>%
-  pivot_longer(-Web) %>%
-  separate(Web, into = c("Grazed2", "Site2"), sep = -1) %>%
-  left_join(
-   tibble(Grazed2 = c("UG", "G"),
-          Treatment = c("Grazed", "Ungrazed")) 
-  ) %>%
-  left_join(
-    tibble(Site2 = c("A", "B", "C", "S"),
-           Site = factor(c("A", "B", "C", "All"), levels = c("A", "B", "C", "All")))
-  ) %>%
-  ggplot(aes(x = Site, y = value, color = Treatment)) + geom_boxplot() + facet_wrap(.~name, scales = "free") + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)"))
-dev.off()
-
 # Calculate total carbon and nitrogen mineralization across the webs ----
 
 # Create a list to store all the results:
 results = vector("list", length = 16)
 
-reps_per_web = 1000
+reps_per_web = 10
 
 set.seed(102132)
 
@@ -247,8 +56,10 @@ pullconsump <- function(x) c(Cmin = sum(x$Cmin), Nmin = sum(x$Nmin))
 
 pullwhomins <- function(x){
   t1 = whomineralizes(x$usin)
-  colSums(t1[t1$ID %in% c("Bacteria", "Fungi"),c(2,3)])
+  colSums(t1[t1$ID %in% c("Predaceousmites"),c(2,4)])
   }
+
+comtrosp(puGA[[1]]$usin, selected = c("Bacteriophagousnematodes","Fungivorousnematodes","Omnivorousnematodes", "Phytophagousnematodes"))
 
 puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
              do.call("rbind",lapply(puGA, pullwhomins)))
@@ -340,56 +151,6 @@ puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
              do.call("rbind",lapply(puGA, pullwhomins)))
 results[[6]] = cbind(as.data.frame(puGA), Web = "UGC")
 
-# META-SITE
-tempsite = Andres2016$GA
-tempsite$prop$B = apply(
-  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
-  1,
-  mean
-)
-
-temperror = matrix(data = apply(
-  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
-  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
-temperror["Roots","B"] = (3000*0.2)^2
-
-puGA = parameter_uncertainty(usin = tempsite,
-                             errormeasure = temperror,
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
-results[[7]] = cbind(as.data.frame(puGA), Web = "GS")
-
-tempsite = Andres2016$UGA
-tempsite$prop$B = apply(
-  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
-  1,
-  mean
-)
-
-temperror = matrix(data = apply(
-  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
-  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
-temperror["Roots","B"] = (3000*0.2)^2
-
-puGA = parameter_uncertainty(usin = tempsite,
-                             errormeasure = temperror,
-                             errortype = "Variance",
-                             fcntorun = "comana", 
-                             replicates = reps_per_web)
-
-
-puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
-             do.call("rbind",lapply(puGA, pullwhomins)))
-results[[8]] = cbind(as.data.frame(puGA), Web = "UGS")
-
-rm(tempsite, temperror)
-
-
 # Holtkamp ------
 
 
@@ -409,7 +170,7 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Young,
 
 puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
              do.call("rbind",lapply(puGA, pullwhomins)))
-results[[9]] = cbind(puGA, Web = "Young")
+results[[7]] = cbind(as.data.frame(puGA), Web = "Young")
 
 errmes2 <- as.matrix(errmes[,"Mid"])
 colnames(errmes2) = "B"
@@ -422,7 +183,7 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Mid,
 
 puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
              do.call("rbind",lapply(puGA, pullwhomins)))
-results[[10]] = cbind(puGA, Web = "Mid")
+results[[8]] = cbind(as.data.frame(puGA), Web = "Mid")
 
 errmes2 <- as.matrix(errmes[-3,"Old"])
 colnames(errmes2) = "B"
@@ -435,7 +196,7 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Old,
 
 puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
              do.call("rbind",lapply(puGA, pullwhomins)))
-results[[11]] = cbind(puGA, Web = "Old")
+results[[9]] = cbind(as.data.frame(puGA), Web = "Old")
 
 errmes2 <- as.matrix(errmes[,"Health"])
 colnames(errmes2) = "B"
@@ -448,32 +209,32 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Heathland,
 
 puGA = cbind(do.call("rbind",lapply(puGA, pullconsump)),
              do.call("rbind",lapply(puGA, pullwhomins)))
-results[[12]] = cbind(puGA, Web = "Heathland")
-
+results[[10]] = cbind(as.data.frame(puGA), Web = "Heathland")
 
 # Summarize
 
 results2 = do.call("rbind", results)
 
 results2 = results2 %>% 
-  mutate(Manuscript = ifelse(Web %in% c("Young", "Mid", "Old", "Heathland"), "Holtkamp et al.", "Andres et al."))
+  mutate(Manuscript = ifelse(Web %in% c("Young", "Mid", "Old", "Heathland"), "Holtkamp et al.", "Andres et al.")) %>%
+  mutate(Web = factor(Web, levels = c("Young", "Mid", "Old", "Heathland", "GA", "UGA", "GB", "UGB", "GC", "UGC")))
 
 cowplot::plot_grid(
   results2 %>%
     tibble() %>%
-    ggplot(aes(x = Cmin, color = Web)) + geom_density() + theme_classic(),
+    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic(),
   
   results2 %>%
     tibble() %>%
-    ggplot(aes(x = Nmin, color = Web, linetype = Manuscript)) + geom_density() + theme_classic(),
+    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic(),
   
   results2 %>%
     tibble() %>%
-    ggplot(aes(x = DirectC, color = Web, linetype = Manuscript)) + geom_density() + theme_classic(),
+    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic(),
   
   results2 %>%
     tibble() %>%
-    ggplot(aes(x = DirectN, color = Web, linetype = Manuscript)) + geom_density() + theme_classic()
+    ggplot(aes(x = Web, y = Cmin, color = Manuscript)) + geom_boxplot() + theme_classic()
 )
 
 png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
