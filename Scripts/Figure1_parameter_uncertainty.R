@@ -53,10 +53,10 @@ puGA = parameter_uncertainty(usin = Andres2016$GA,
                              replicates = reps_per_web)
 
 pullconsump <- function(x){c(
-  Cmin = sum(x$Cmin),
-  Cflux = sum(x$fmat),
-  BEC = x$consumption["Bacteria"],
-  FEC = x$consumption["Fungi"]
+  `C mineralization` = sum(x$Cmin),
+  `Total C Flux` = sum(x$fmat),
+  `Bacteria consumption` = unname(x$consumption["Bacteria"]),
+  `Fungal consumption` = unname(x$consumption["Fungi"])
   
 )
   
@@ -145,67 +145,65 @@ puGA = parameter_uncertainty(usin = Andres2016$UGC,
 puGA = do.call("rbind",lapply(puGA, pullconsump))
 results[[6]] = cbind(as.data.frame(puGA), Web = "UGC")
 
-# META-SITE
-tempsite = Andres2016$GA
-tempsite$prop$B = apply(
-  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
-  1,
-  mean
-)
 
-temperror = matrix(data = apply(
-  matrix(c(Andres2016$GA$prop$B,Andres2016$GB$prop$B,Andres2016$GC$prop$B), nrow = 21, ncol = 3),
-  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
-temperror["Roots","B"] = (3000*0.2)^2
+# Load in errors, convert SD to VAR
+errmes <- as.matrix(read.csv("Data/Holtkamp/biomass_sd.csv", header = T, row.names = 1))^2
 
-puGA = parameter_uncertainty(usin = tempsite,
-                             errormeasure = temperror,
+errmes2 <- as.matrix(errmes[,"Young"])
+colnames(errmes2) = "B"
+
+puGA = parameter_uncertainty(usin = Holtkamp2011$Young,
+                             errormeasure = errmes2,
                              errortype = "Variance",
                              fcntorun = "comana", 
                              replicates = reps_per_web)
 
-
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[7]] = cbind(as.data.frame(puGA), Web = "GS")
+results[[7]] = cbind(as.data.frame(puGA), Web = "Young")
 
-tempsite = Andres2016$UGA
-tempsite$prop$B = apply(
-  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
-  1,
-  mean
-)
+errmes2 <- as.matrix(errmes[,"Mid"])
+colnames(errmes2) = "B"
 
-temperror = matrix(data = apply(
-  matrix(c(Andres2016$UGA$prop$B,Andres2016$UGB$prop$B,Andres2016$UGC$prop$B), nrow = 21, ncol = 3),
-  1,var), nrow = dim(biomassescur)[1], ncol = 1, dimnames = list(Andres2016$GA$prop$ID, "B"))
-temperror["Roots","B"] = (3000*0.2)^2
-
-puGA = parameter_uncertainty(usin = tempsite,
-                             errormeasure = temperror,
+puGA = parameter_uncertainty(usin = Holtkamp2011$Mid,
+                             errormeasure = errmes2,
                              errortype = "Variance",
                              fcntorun = "comana", 
                              replicates = reps_per_web)
 
+puGA = do.call("rbind",lapply(puGA, pullconsump))
+results[[8]] = cbind(as.data.frame(puGA), Web = "Mid")
+
+errmes <- as.matrix(read.csv("Data/Holtkamp/biomass_sd.csv", header = T, row.names = 1))^2
+
+errmes2 <- as.matrix(errmes[-3,"Old"])
+colnames(errmes2) = "B"
+
+puGA = parameter_uncertainty(usin = Holtkamp2011$Old,
+                             errormeasure = errmes2,
+                             errortype = "Variance",
+                             fcntorun = "comana", 
+                             replicates = reps_per_web)
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[8]] = cbind(as.data.frame(puGA), Web = "UGS")
+results[[9]] = cbind(as.data.frame(puGA), Web = "Old")
 
-rm(tempsite, temperror)
+errmes2 <- as.matrix(errmes[,"Health"])
+colnames(errmes2) = "B"
+
+puGA = parameter_uncertainty(usin = Holtkamp2011$Heathland,
+                             errormeasure = errmes2,
+                             errortype = "Variance",
+                             fcntorun = "comana", 
+                             replicates = reps_per_web)
+
+puGA = do.call("rbind",lapply(puGA, pullconsump))
+results[[10]] = cbind(as.data.frame(puGA), Web = "Heathland")
 
 results2 = do.call("rbind", results)
 
-png("Plots/demonstration_parameteruncertainty.png", width = 8, height = 5, units = "in", res = 600)
+png("Plots/demonstration_parameteruncertainty.png", width = 10, height = 5, units = "in", res = 600)
 results2 %>%
   tibble() %>%
   pivot_longer(-Web) %>%
-  separate(Web, into = c("Grazed2", "Site2"), sep = -1) %>%
-  left_join(
-    tibble(Grazed2 = c("UG", "G"),
-           Treatment = c("Grazed", "Ungrazed")) 
-  ) %>%
-  left_join(
-    tibble(Site2 = c("A", "B", "C", "S"),
-           Site = factor(c("A", "B", "C", "All"), levels = c("A", "B", "C", "All")))
-  ) %>%
-  ggplot(aes(x = Site, y = value, color = Treatment)) + geom_boxplot() + facet_wrap(.~name, scales = "free") + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)"))
+  ggplot(aes(x = Web, y = value)) + geom_boxplot() + facet_wrap(.~name, scales = "free") + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)"))
 dev.off()
