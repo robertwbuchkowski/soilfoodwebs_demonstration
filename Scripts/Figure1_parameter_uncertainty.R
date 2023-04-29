@@ -16,7 +16,7 @@ p_load(soilfoodwebs,tidyverse)
 # Create a list to store all the results:
 results = vector("list", length = 16)
 
-reps_per_web = 100
+reps_per_web = 1000
 
 set.seed(102132)
 
@@ -52,18 +52,10 @@ puGA = parameter_uncertainty(usin = Andres2016$GA,
                              fcntorun = "comana", 
                              replicates = reps_per_web)
 
-pullconsump <- function(x){c(
-  `C mineralization` = sum(x$Cmin),
-  `Total C Flux` = sum(x$fmat),
-  `Bacteria consumption` = unname(x$consumption["Bacteria"]),
-  `Fungal consumption` = unname(x$consumption["Fungi"])
-  
-)
-  
-}
+pullconsump <- function(x){x$consumption}
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[1]] = cbind(as.data.frame(puGA), Web = "GA")
+results[[1]] = cbind(as.data.frame(puGA), Web = "GA", MS = "Andres2016") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 
 biomassescur = biomasses %>% filter(name == "A_UG") %>%
@@ -79,7 +71,7 @@ puGA = parameter_uncertainty(usin = Andres2016$UGA,
 
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[2]] = cbind(as.data.frame(puGA), Web = "UGA")
+results[[2]] = cbind(as.data.frame(puGA), Web = "UGA", MS = "Andres2016") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 # SITE B
 biomassescur = biomasses %>% filter(name == "B_G") %>%
@@ -95,7 +87,7 @@ puGA = parameter_uncertainty(usin = Andres2016$GB,
 
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[3]] = cbind(as.data.frame(puGA), Web = "GB")
+results[[3]] = cbind(as.data.frame(puGA), Web = "GB", MS = "Andres2016") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 
 biomassescur = biomasses %>% filter(name == "B_UG") %>%
@@ -111,7 +103,7 @@ puGA = parameter_uncertainty(usin = Andres2016$UGB,
 
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[4]] = cbind(as.data.frame(puGA), Web = "UGB")
+results[[4]] = cbind(as.data.frame(puGA), Web = "UGB", MS = "Andres2016") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 # SITE C
 biomassescur = biomasses %>% filter(name == "C_G") %>%
@@ -127,7 +119,7 @@ puGA = parameter_uncertainty(usin = Andres2016$GC,
 
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[5]] = cbind(as.data.frame(puGA), Web = "GC")
+results[[5]] = cbind(as.data.frame(puGA), Web = "GC", MS = "Andres2016") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 
 biomassescur = biomasses %>% filter(name == "C_UG") %>%
@@ -143,7 +135,7 @@ puGA = parameter_uncertainty(usin = Andres2016$UGC,
 
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[6]] = cbind(as.data.frame(puGA), Web = "UGC")
+results[[6]] = cbind(as.data.frame(puGA), Web = "UGC", MS = "Andres2016") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 
 # Load in errors, convert SD to VAR
@@ -159,7 +151,7 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Young,
                              replicates = reps_per_web)
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[7]] = cbind(as.data.frame(puGA), Web = "Young")
+results[[7]] = cbind(as.data.frame(puGA), Web = "Young", MS = "Holtkamp2011") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 errmes2 <- as.matrix(errmes[,"Mid"])
 colnames(errmes2) = "B"
@@ -171,7 +163,7 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Mid,
                              replicates = reps_per_web)
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[8]] = cbind(as.data.frame(puGA), Web = "Mid")
+results[[8]] = cbind(as.data.frame(puGA), Web = "Mid", MS = "Holtkamp2011") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 errmes <- as.matrix(read.csv("Data/Holtkamp/biomass_sd.csv", header = T, row.names = 1))^2
 
@@ -185,7 +177,7 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Old,
                              replicates = reps_per_web)
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[9]] = cbind(as.data.frame(puGA), Web = "Old")
+results[[9]] = cbind(as.data.frame(puGA), Web = "Old", MS = "Holtkamp2011") %>% tibble() %>% pivot_longer(!Web & !MS)
 
 errmes2 <- as.matrix(errmes[,"Health"])
 colnames(errmes2) = "B"
@@ -197,13 +189,25 @@ puGA = parameter_uncertainty(usin = Holtkamp2011$Heathland,
                              replicates = reps_per_web)
 
 puGA = do.call("rbind",lapply(puGA, pullconsump))
-results[[10]] = cbind(as.data.frame(puGA), Web = "Heathland")
+results[[10]] = cbind(as.data.frame(puGA), Web = "Heathland", MS = "Holtkamp2011")  %>% tibble() %>% pivot_longer(!Web & !MS)
 
 results2 = do.call("rbind", results)
 
-png("Plots/demonstration_parameteruncertainty.png", width = 10, height = 5, units = "in", res = 600)
+
+results2 = results2 %>%
+  left_join(
+    read_csv("Data/matching_trophicspecies.csv"), by = c("name" = "ID", "MS" = "Web2"),relationship = "many-to-many"
+  ) %>%
+  filter(Group2 != "SOM") %>%
+  filter(Group2 != "Roots") %>%
+  filter(!(Group3 %in% c("Proturans", "Symphyla", "Dilurans", "Enchytraeids", "Ciliates", "CryJuvMite", "PredCol")))
+
 results2 %>%
-  tibble() %>%
-  pivot_longer(-Web) %>%
-  ggplot(aes(x = Web, y = value)) + geom_boxplot() + facet_wrap(.~name, scales = "free") + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)"))
+  filter(Group3 %in% c("Bacteria", "Fungi")) %>%
+  pull(value) %>% min()
+
+png("Plots/demonstration_parameteruncertainty.png", width = 12, height = 6, units = "in", res = 600)
+results2 %>%
+  mutate(Group3 = factor(Group3, levels = c("Bacteria", "Fungi", "Amoebae", "Flagellates", "BactNem", "FungNem", "OmniNem", "PhytoNem", "PredNem", "FungCol", "CryMite", "NonCryMite", "NemMite","PredMite"))) %>%
+  ggplot(aes(x = Group3, y = value, color = MS, group = paste0(Group3, Web))) + geom_hline(yintercept = c(0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000), linetype = 2, color = 'grey') + geom_boxplot(outlier.size = 0.5) + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)")) + scale_y_continuous(trans = "log", breaks = c(0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000)) + geom_vline(xintercept = c(2.5, 4.5, 9.5), linetype = 2) + xlab("Trophic Group") + annotate(geom = "text", x = c(1.5, 3.5, 7, 12), y = 20000, label = c("Microbes", "Single-cell Pred.", "Nematodes", "Microarthropods"))
 dev.off()
