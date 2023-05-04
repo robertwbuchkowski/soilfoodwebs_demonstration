@@ -206,8 +206,15 @@ results2 %>%
   filter(Group3 %in% c("Bacteria", "Fungi")) %>%
   pull(value) %>% min()
 
+
+
 png("Plots/demonstration_parameteruncertainty.png", width = 12, height = 6, units = "in", res = 600)
 results2 %>%
   mutate(Group3 = factor(Group3, levels = c("Bacteria", "Fungi", "Amoebae", "Flagellates", "BactNem", "FungNem", "OmniNem", "PhytoNem", "PredNem", "FungCol", "CryMite", "NonCryMite", "NemMite","PredMite"))) %>%
-  ggplot(aes(x = Group3, y = value, color = MS, group = paste0(Group3, Web))) + geom_hline(yintercept = c(0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000), linetype = 2, color = 'grey') + geom_boxplot(outlier.size = 0.5) + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)")) + scale_y_continuous(trans = "log", breaks = c(0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000)) + geom_vline(xintercept = c(2.5, 4.5, 9.5), linetype = 2) + xlab("Trophic Group") + annotate(geom = "text", x = c(1.5, 3.5, 7, 12), y = 20000, label = c("Microbes", "Single-cell Pred.", "Nematodes", "Microarthropods"))
+  mutate(Web = factor(Web, levels = c("GA","UGA","GB","UGB","GC","UGC","Young","Mid","Old","Heathland"))) %>%
+  left_join(
+    tibble(MS = c("Andres2016", "Holtkamp2011"),
+           Manuscript = c("Andrés et al. 2016", "Holtkamp et al. 2011"))
+  ) %>%
+  ggplot(aes(x = Group3, y = value, color = Manuscript, group = paste0(Group3, Web))) + geom_hline(yintercept = c(0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000), linetype = 2, color = 'grey') + geom_boxplot(outlier.size = 0.5) + theme_classic() + ylab(parse(text = "Carbon~consumption~(kg[C]~ha^-1~yr^-1)")) + scale_y_continuous(trans = "log", breaks = c(0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000)) + geom_vline(xintercept = c(2.5, 4.5, 9.5), linetype = 2) + xlab("Trophic Group") + annotate(geom = "text", x = c(1.5, 3.5, 7, 12), y = 20000, label = c("Microbes", "Single-cell Pred.", "Nematodes", "Microarthropods"))
 dev.off()
