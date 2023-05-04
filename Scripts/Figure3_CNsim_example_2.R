@@ -23,9 +23,9 @@ comm2 = comtrosp(comm2, selected = c("Ciliates", "Flagellates", "Amoeba"), newna
 
 comm2
 
-out1 = CNsim(comm1, TIMES = 1:20,start_mod = c(1.1,rep(1, 18), 1.1, 1))
+out1 = CNsim(comm1, TIMES = 1:10,start_mod = c(0.95,rep(1, 18), 0.95, 1))
 
-out2 = CNsim(comm2, TIMES = 1:100,start_mod = c(0.99,rep(1, 10)))
+out2 = CNsim(comm2, TIMES = 1:100,start_mod = c(0.95,rep(1, 10)))
 
 out1 %>%
   tibble() %>%
@@ -34,6 +34,6 @@ out1 %>%
   filter(Element %in% c("Carbon","Nitrogen")) %>%
   pivot_wider(names_from = Element) %>%
   mutate(CN = Carbon/Nitrogen) %>%
-  ggplot(aes(x = Day, y = Nitrogen)) + geom_line() +facet_wrap(.~State, scales = "free")
+  ggplot(aes(x = Day, y = CN)) + geom_line() +facet_wrap(.~State, scales = "free")
 
 comm1$prop$ID
