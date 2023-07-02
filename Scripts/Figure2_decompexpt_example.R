@@ -155,7 +155,7 @@ results2 = do.call("rbind",results) %>%
 results2$Web = factor(results2$Web, levels = c("Young", "Mid", "Old", "Heathland"))
 
 Figure3B = results2 %>%
-  ggplot(aes(x = Day, y = m, color = Web, fill = Web, group = Web)) + geom_line(lwd = 1.5) + theme_classic() + xlab("Year") + ylab("Effect of oribatids on remaining litter (%)") +
+  ggplot(aes(x = Day, y = m, color = Web, fill = Web, group = Web)) + geom_line(lwd = 1.5) + theme_classic() + xlab("Year") + ylab("Change in remaining litter\n caused by oribatids (%)") +
   geom_errorbar(aes(ymin = m -sd, ymax = m+sd),data = results2 %>%
                   filter(Day == 10 & Web == "Young"|
                            Day == 11 & Web == "Mid"|
@@ -169,6 +169,9 @@ Figure3B = results2 %>%
                            Day == 41 & Web == "Mid"|
                            Day == 42 & Web == "Old"|
                            Day == 43 & Web == "Heathland") )
+
+# Look at the figure:
+Figure3B
 
 png("Plots/demonstration_decomp.png", width = 8, height = 4, units = "in", res = 1200)
 ggpubr::ggarrange(Figure3A,Figure3B, labels = "AUTO", common.legend = T)
