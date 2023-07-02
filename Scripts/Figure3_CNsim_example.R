@@ -197,11 +197,11 @@ CPERfull %>%
   select(-RunID) %>%
   pivot_wider(names_from = Type) %>%
   mutate(run = ifelse(run == "base", "Density-independent", run)) %>%
-  ggplot(aes(x = Day, fill = run, group = paste0(run, Model))) + geom_ribbon(aes(ymin = Min, ymax = Max), alpha = 0.4) + facet_grid(TL~Model, scales = "free") + theme_classic() + scale_fill_manual(values = c("blue", "orange")) + scale_color_manual(values = c("blue", "orange")) +
+  ggplot(aes(x = Day, fill = run, group = paste0(run, Model))) + geom_ribbon(aes(ymin = Min, ymax = Max), alpha = 0.4) + facet_grid(TL~Model, scales = "free") + theme_classic() +
   geom_line(aes(y = value, color = run),
             data = CPERexample %>%
               mutate(run = ifelse(run == "base", "Density-independent", run))%>%
-              filter(!(TL %in% c("Phytophagousnematodes", "Roots"))) ) + ylab("Biomass (Kg[C] per ha)") + xlab("Year")
+              filter(!(TL %in% c("Phytophagousnematodes", "Roots"))) ) + ylab("Biomass (Kg[C] per ha)") + xlab("Year") + scale_color_discrete(name = "Death rate") + scale_fill_discrete(name = "Death rate")
 dev.off()  
 
 
